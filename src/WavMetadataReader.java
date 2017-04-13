@@ -1,5 +1,3 @@
-package PACKAGE_NAME;
-
 /**
  * Created by plexinvise on 4/12/17.
  */
