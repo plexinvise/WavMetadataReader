@@ -56,7 +56,7 @@ public class WavMetadataReader {
         return byteLenght;
     }
 
-    //Building string for final result of this class
+    //Building string for final result of this class Pattern: Date Time Phone Operator Filename
     private static String resultSorter (File inputFile, String stringMetadata) {
         String formatedResult = getDate(stringMetadata) + " " + getTime(stringMetadata) + " "
                 + getPhone(stringMetadata) + " " + getExtension(stringMetadata)
