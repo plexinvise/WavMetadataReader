@@ -43,7 +43,9 @@ public class WavMetadataReader {
         return resultSorter(inputFile, encodedMetadata);
     }
 
-    //Calculating metadata length here
+    /*Calculating metadata length here
+    (AudioInputStream cutting metadata and InputStream not - difference is the metadata length)
+     */
     private static int byteLengthDifference(InputStream inputStream, AudioInputStream audioInputStream) {
         int byteLenght = 0;
         if (inputStream != null && audioInputStream != null) {
@@ -53,7 +55,13 @@ public class WavMetadataReader {
                 e.printStackTrace();
             }
         }
-        return byteLenght;
+        if (byteLenght!=0) {
+            return byteLenght;
+        } {
+            System.out.println("No metadata found");
+            return 0;
+        }
+
     }
 
     //Building string for final result of this class Pattern: Date Time Phone Operator Filename
@@ -66,8 +74,10 @@ public class WavMetadataReader {
     }
 
     //Next 4 methods to get info we interested in from the string
+    //Rules not covering most of situations (Phones, Extensions), need something more flexible
     private static String getPhone (String stringMetadata) {
         String phone = null;
+        //10 symbols after + will not cover all variants
         Pattern pattern = Pattern.compile("\\+\\d{10}");
         Matcher matcher = pattern.matcher(stringMetadata);
         if (matcher.find()) {
