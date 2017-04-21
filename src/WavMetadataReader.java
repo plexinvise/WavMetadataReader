@@ -2,6 +2,8 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.io.*;
 
 
@@ -36,8 +38,9 @@ public class WavMetadataReader {
 
         //Converting and writing to String
         String encodedMetadata = IOUtils.toString(metadataBytes, "UTF-8");
-        System.out.println(encodedMetadata);
-        return encodedMetadata;
+
+        //returning formatted string gathered with resultSorter method
+        return resultSorter(inputFile, encodedMetadata);
     }
 
     //Calculating metadata length here
@@ -53,11 +56,54 @@ public class WavMetadataReader {
         return byteLenght;
     }
 
-    private static void saveToFile (String stringToSave, String filePath) throws FileNotFoundException {
-        //Checking if the file is existing file and we have access to write
-        if (new File(filePath).isFile()&&new File(filePath).exists()&&new File(filePath).canRead()) {
-            //not complete
+    //Building string for final result of this class
+    private static String resultSorter (File inputFile, String stringMetadata) {
+        String formatedResult = getDate(stringMetadata) + " " + getTime(stringMetadata) + " "
+                + getPhone(stringMetadata) + " " + getExtension(stringMetadata)
+                + " " + inputFile.getName();
+        System.out.println(formatedResult);
+        return formatedResult;
+    }
+
+    //Next 4 methods to get info we interested in from the string
+    private static String getPhone (String stringMetadata) {
+        String phone = null;
+        Pattern pattern = Pattern.compile("\\+\\d{10}");
+        Matcher matcher = pattern.matcher(stringMetadata);
+        if (matcher.find()) {
+            phone = matcher.group(0);
         }
+        return phone;
+    }
+
+    private static String getExtension (String stringMetadata) {
+        String extension = null;
+        Pattern pattern = Pattern.compile("Extn\\d{3}");
+        Matcher matcher = pattern.matcher(stringMetadata);
+        if (matcher.find()) {
+            extension = matcher.group(0);
+        }
+        return extension;
+    }
+
+    private static String getDate (String stringMetadata) {
+        String date = null;
+        Pattern pattern = Pattern.compile("\\d{4}/\\d{2}/\\d{2}");
+        Matcher matcher = pattern.matcher(stringMetadata);
+        if (matcher.find()) {
+            date = matcher.group(0);
+        }
+        return date;
+    }
+
+    private static String getTime (String stringMetadata) {
+        String time = null;
+        Pattern pattern = Pattern.compile("\\d{2}:\\d{2}:\\d{2}");
+        Matcher matcher = pattern.matcher(stringMetadata);
+        if (matcher.find()) {
+            time = matcher.group(0);
+        }
+        return time;
     }
 
 }
