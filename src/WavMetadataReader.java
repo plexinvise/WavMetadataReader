@@ -14,11 +14,12 @@ import org.apache.commons.io.*;
 public class WavMetadataReader {
 
     public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
-        File inputFile = new File("..//WavMetadataReader//sounds//MSG365857067000515_192.168.44.118.wav");
-        getMetadata(inputFile);
+        File inputFile = new File("..//WavMetadataReader//sounds//MSG365857069500516_192.168.44.118.wav");
+        String outputFile = "..//WavMetadataReader//output//metaDataCollector.txt";
+        MetadataSavingUtility.saveToFile(getMetadata(inputFile), outputFile, inputFile.getName());
     }
 
-    private static String getMetadata(File inputFile) throws javax.sound.sampled.UnsupportedAudioFileException, java.io.IOException {
+    private static String getMetadata(File inputFile) throws java.io.IOException, UnsupportedAudioFileException {
 
         //Creating streams to find how much bytes metadata takes
         InputStream inputStream = new FileInputStream(inputFile);
@@ -64,17 +65,19 @@ public class WavMetadataReader {
 
     }
 
-    //Building string for final result of this class Pattern: Date Time Phone Operator Filename
+    /*Building string for final result of this class
+    Pattern: Date Time Phone Operator Filename
+     */
     private static String resultSorter (File inputFile, String stringMetadata) {
         String formatedResult = getDate(stringMetadata) + " " + getTime(stringMetadata) + " "
                 + getPhone(stringMetadata) + " " + getExtension(stringMetadata)
                 + " " + inputFile.getName();
-        System.out.println(formatedResult);
         return formatedResult;
     }
 
-    //Next 4 methods to get info we interested in from the string
-    //Rules not covering most of situations (Phones, Extensions), need something more flexible
+    /*Next 4 methods to get info we interested in from the string
+    Rules not covering most of situations (Phones, Extensions), need something more flexible
+     */
     private static String getPhone (String stringMetadata) {
         String phone = null;
         //10 symbols after + will not cover all variants
