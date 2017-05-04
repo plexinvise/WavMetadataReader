@@ -8,14 +8,17 @@ import java.util.regex.Pattern;
  */
 public class MetadataSavingUtility {
 
+    private static File inputFile;
+
     /*
     Saving inputString to file, checking if file is not processed
      */
     public static void saveToFile(String stringToSave, String destFilePath, String inputFileName) throws IOException {
+        inputFile = new File(destFilePath);
         //Checking if the file is existing file
-        if (new File(destFilePath).exists() && new File(destFilePath).isFile()) {
+        if (inputFile.exists() && inputFile.isFile()) {
             ArrayList<String> outputArray =
-                    (ArrayList<String>) FileUtils.readLines(new File(destFilePath), "UTF-8");
+                    (ArrayList<String>) FileUtils.readLines(inputFile, "UTF-8");
             //Checking if we already stored this file metadata
             if (!isDuplicate(outputArray, inputFileName)) {
                 //writing to file with append mode true
@@ -35,9 +38,9 @@ public class MetadataSavingUtility {
     Returning Boolean to make sure that file created and we can use recursive call in saveToFile method
      */
     private static Boolean createFile(String destFilePath) throws IOException {
-        if (!new File(destFilePath).getParentFile().exists()) {
-            new File(destFilePath).getParentFile().mkdir();
-            if (new File(destFilePath).createNewFile()) {
+        if (!inputFile.getParentFile().exists()) {
+            inputFile.getParentFile().mkdir();
+            if (inputFile.createNewFile()) {
                 return true;
             }
         }
@@ -51,7 +54,7 @@ public class MetadataSavingUtility {
      */
     private static void writeToFile(String stringToSave, String destFilePath) throws IOException {
         //Just in case file is not writable
-        if (new File(destFilePath).canWrite()) {
+        if (inputFile.canWrite()) {
             FileWriter writer = new FileWriter(destFilePath, true);
             writer.write(stringToSave);
             writer.write(System.lineSeparator());
