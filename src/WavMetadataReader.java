@@ -58,7 +58,7 @@ public class WavMetadataReader {
             try {
                 byteLenght = inputStream.available() - audioInputStream.available();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Caught exception", e);
             }
         }
         if (byteLenght!=0) {
