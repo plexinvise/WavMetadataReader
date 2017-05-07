@@ -2,9 +2,11 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.*;
+import org.apache.log4j.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.*;
+import org.apache.log4j.PropertyConfigurator;
 
 
 /**
@@ -13,7 +15,10 @@ import org.apache.commons.io.*;
 
 public class WavMetadataReader {
 
+    static Logger logger = Logger.getLogger(WavMetadataReader.class.getName());
+
     public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
+        PropertyConfigurator.configure("..//WavMetadataReader//log4j.properties");
         File inputFile = new File("..//WavMetadataReader//wavInputFiles//MSG365857069500516_192.168.44.118.wav");
         String outputFile = "..//WavMetadataReader//output//metaDataCollector.txt";
         MetadataSavingUtility.saveToFile(getMetadata(inputFile), outputFile, inputFile.getName());
@@ -59,7 +64,7 @@ public class WavMetadataReader {
         if (byteLenght!=0) {
             return byteLenght;
         } {
-            System.out.println("No metadata found");
+            logger.warn("No metadata found");
             return 0;
         }
 

@@ -1,6 +1,8 @@
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.PropertyConfigurator;
 import java.io.*;
 import java.util.ArrayList;
+import org.apache.log4j.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -9,11 +11,14 @@ import java.util.regex.Pattern;
 public class MetadataSavingUtility {
 
     private static File inputFile;
+    static Logger logger = Logger.getLogger(WavMetadataReader.class.getName());
+
 
     /*
     Saving inputString to file, checking if file is not processed
      */
     public static void saveToFile(String stringToSave, String destFilePath, String inputFileName) throws IOException {
+        PropertyConfigurator.configure("..//WavMetadataReader//log4j.properties");
         inputFile = new File(destFilePath);
         //Checking if the file is existing file
         if (inputFile.exists() && inputFile.isFile()) {
@@ -23,12 +28,13 @@ public class MetadataSavingUtility {
             if (!isDuplicate(outputArray, inputFileName)) {
                 //writing to file with append mode true
                 writeToFile(stringToSave, destFilePath);
-            } else System.out.println("File "+inputFileName+" already has been processed");
+            } else logger.info("File "+inputFileName+" already has been processed");
         } else {
             //in case file not exist
             if (createFile(destFilePath)) {
                 //ACHTUNG!!! RECURSION DETECTED!!!
                 saveToFile(stringToSave, destFilePath, inputFileName);
+
             }
         }
     }
@@ -44,7 +50,7 @@ public class MetadataSavingUtility {
                 return true;
             }
         }
-        System.out.println("File not created!!!");
+
         return false;
     }
 
@@ -60,7 +66,7 @@ public class MetadataSavingUtility {
             writer.write(System.lineSeparator());
             writer.close();
         } else {
-            System.out.println("Can not access file "+destFilePath+". Make sure file is not locked");
+            logger.warn("Can not access file "+destFilePath+". Make sure file is not locked");
         }
     }
 
