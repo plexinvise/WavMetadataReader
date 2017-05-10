@@ -53,7 +53,7 @@ public class WavMetadataReader {
     (AudioInputStream cutting metadata and InputStream not - difference is the metadata length)
      */
     private static int byteLengthDifference(InputStream inputStream, AudioInputStream audioInputStream) {
-        int byteLenght = 0;
+        int byteLenght = 0; // typo
         if (inputStream != null && audioInputStream != null) {
             try {
                 byteLenght = inputStream.available() - audioInputStream.available();
@@ -63,7 +63,7 @@ public class WavMetadataReader {
         }
         if (byteLenght!=0) {
             return byteLenght;
-        } {
+        } { // what the language construction is that?
             logger.warn("No metadata found");
             return 0;
         }
@@ -73,6 +73,7 @@ public class WavMetadataReader {
     /*Building string for final result of this class
     Pattern: Date Time Phone Operator Filename
      */
+    // Use StringBuilder in method below
     private static String resultSorter (File inputFile, String stringMetadata) {
         String formatedResult = getMetadataPart(stringMetadata, "\\d{4}/\\d{2}/\\d{2}")
                 + " " + getMetadataPart(stringMetadata, "\\d{2}:\\d{2}:\\d{2}")
