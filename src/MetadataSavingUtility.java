@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 public class MetadataSavingUtility {
 
     private static File inputFile;
+    // use getClass() method as parameter for logger. It would help to get proper logging in case of class extension in future
     static Logger logger = Logger.getLogger(WavMetadataReader.class.getName());
 
 
@@ -22,6 +23,9 @@ public class MetadataSavingUtility {
         inputFile = new File(destFilePath);
         //Checking if the file is existing file
         if (inputFile.exists() && inputFile.isFile()) {
+            // 1. Use List datatype for variable declaration
+            // 2. You cannot rely on FileUtils.readLines() returning type, it's better to wrap result with 
+            // new ArrayList(...) than cast it.
             ArrayList<String> outputArray =
                     (ArrayList<String>) FileUtils.readLines(inputFile, "UTF-8");
             //Checking if we already stored this file metadata
@@ -43,6 +47,8 @@ public class MetadataSavingUtility {
     Creating file in specified path, if parent directory not exist - creating it too
     Returning Boolean to make sure that file created and we can use recursive call in saveToFile method
      */
+    // It would be better to use primitive 'boolean' as return type in the following method. 
+    // Object 'Boolean' datatype means that result could be null, which is not true
     private static Boolean createFile(String destFilePath) throws IOException {
         if (!inputFile.getParentFile().exists()) {
             inputFile.getParentFile().mkdir();
@@ -62,6 +68,8 @@ public class MetadataSavingUtility {
         //Just in case file is not writable
         if (inputFile.canWrite()) {
             FileWriter writer = new FileWriter(destFilePath, true);
+            // better to use 'write' method once - when you call it two times instead of one, it executes twice as long as one. 
+            // that would be cause of bad performance in future. 
             writer.write(stringToSave);
             writer.write(System.lineSeparator());
             writer.close();
@@ -73,8 +81,10 @@ public class MetadataSavingUtility {
     /*
     Checking if we have this string in the file
      */
+    // It would be better to use primitive 'boolean' as return type in the following method. 
+    // Object 'Boolean' datatype means that result could be null, which is not true
     private static Boolean isDuplicate(ArrayList<String> list, String inputFileName) {
-        Pattern pattern = Pattern.compile(inputFileName, Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile(inputFileName, Pattern.CASE_INSENSITIVE);        
         for (String line : list
                 ) {
             if (pattern.matcher(line).find()) {
