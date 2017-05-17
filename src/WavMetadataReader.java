@@ -2,6 +2,8 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.*;
+
+import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import org.apache.log4j.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,7 +33,18 @@ public class WavMetadataReader {
         AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(inputFile);
 
         //creating byte[] with size = metadata length found with byteLengthDifference method
-        byte[] metadataBytes = new byte[byteLengthDifference(inputStream, audioInputStream)];
+        byte[] metadataBytes;
+        try {
+            metadataBytes = new byte[byteLengthDifference(inputStream, audioInputStream)];
+        } catch (IllegalArgumentException error) {
+
+            /*
+             Need to discuss how to make this output more friendly
+             This mechanism is to prevent writing null values into file if no metadata found
+             */
+            logger.error("No metadata found, execution will be aborted for "+inputFile.getName(), error);
+            throw error;
+        }
 
         //Closing, for the glory of memory
         audioInputStream.close();
@@ -58,14 +71,13 @@ public class WavMetadataReader {
             try {
                 byteLength = inputStream.available() - audioInputStream.available();
             } catch (IOException e) {
-                logger.error("Caught exception: ", e);
+                logger.error(e);
             }
         }
         if (byteLength!=0) {
             return byteLength;
         } else { //Added else, my bad
-            logger.warn("No metadata found");
-            return 0;
+            throw new IllegalArgumentException();
         }
 
     }

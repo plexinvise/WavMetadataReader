@@ -25,14 +25,13 @@ public class MetadataSavingUtility {
         inputFile = new File(destFilePath);
         //Checking if the file is existing file
         if (inputFile.exists() && inputFile.isFile()) {
-            // 1. Use List datatype for variable declaration
-            // 2. You cannot rely on FileUtils.readLines() returning type, it's better to wrap result with 
-            // new ArrayList(...) than cast it.
+            // As understood it is for making changes easily?
             List outputArray = new ArrayList(FileUtils.readLines(inputFile, "UTF-8"));
             //Checking if we already stored this file metadata
             if (!isDuplicate((ArrayList<String>) outputArray, inputFileName)) {
                 //writing to file with append mode true
                 writeToFile(stringToSave, destFilePath);
+                logger.info("File "+inputFileName+" processed");
             } else logger.info("File "+inputFileName+" already has been processed");
         } else {
             //in case file not exist
@@ -50,7 +49,7 @@ public class MetadataSavingUtility {
      */
     // It would be better to use primitive 'boolean' as return type in the following method. 
     // Object 'Boolean' datatype means that result could be null, which is not true
-    //That was typo that I did not even mentioned
+    //That was typo that I did not even mentioned, fixed
     private static boolean createFile() throws IOException {
         if (!inputFile.getParentFile().exists()) {
             inputFile.getParentFile().mkdir();
