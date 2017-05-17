@@ -3,6 +3,7 @@ import org.apache.log4j.PropertyConfigurator;
 import java.io.*;
 import java.util.ArrayList;
 import org.apache.log4j.Logger;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -12,7 +13,8 @@ public class MetadataSavingUtility {
 
     private static File inputFile;
     // use getClass() method as parameter for logger. It would help to get proper logging in case of class extension in future
-    static Logger logger = Logger.getLogger(WavMetadataReader.class.getName());
+    //Changed, need more details about logger
+    static Logger logger = Logger.getLogger(MetadataSavingUtility.class);
 
 
     /*
@@ -26,16 +28,15 @@ public class MetadataSavingUtility {
             // 1. Use List datatype for variable declaration
             // 2. You cannot rely on FileUtils.readLines() returning type, it's better to wrap result with 
             // new ArrayList(...) than cast it.
-            ArrayList<String> outputArray =
-                    (ArrayList<String>) FileUtils.readLines(inputFile, "UTF-8");
+            List outputArray = new ArrayList(FileUtils.readLines(inputFile, "UTF-8"));
             //Checking if we already stored this file metadata
-            if (!isDuplicate(outputArray, inputFileName)) {
+            if (!isDuplicate((ArrayList<String>) outputArray, inputFileName)) {
                 //writing to file with append mode true
                 writeToFile(stringToSave, destFilePath);
             } else logger.info("File "+inputFileName+" already has been processed");
         } else {
             //in case file not exist
-            if (createFile(destFilePath)) {
+            if (createFile()) {
                 //ACHTUNG!!! RECURSION DETECTED!!!
                 saveToFile(stringToSave, destFilePath, inputFileName);
 
@@ -49,7 +50,8 @@ public class MetadataSavingUtility {
      */
     // It would be better to use primitive 'boolean' as return type in the following method. 
     // Object 'Boolean' datatype means that result could be null, which is not true
-    private static Boolean createFile(String destFilePath) throws IOException {
+    //That was typo that I did not even mentioned
+    private static boolean createFile() throws IOException {
         if (!inputFile.getParentFile().exists()) {
             inputFile.getParentFile().mkdir();
             if (inputFile.createNewFile()) {

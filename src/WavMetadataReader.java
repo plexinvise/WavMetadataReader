@@ -15,11 +15,11 @@ import org.apache.log4j.PropertyConfigurator;
 
 public class WavMetadataReader {
 
-    static Logger logger = Logger.getLogger(WavMetadataReader.class.getName());
+    static Logger logger = Logger.getLogger(WavMetadataReader.class);
 
     public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
         PropertyConfigurator.configure("..//WavMetadataReader//log4j.properties");
-        File inputFile = new File("..//WavMetadataReader//wavInputFiles//MSG365857069500516_192.168.44.118.wav");
+        File inputFile = new File("..//WavMetadataReader//wavInputFiles//MSG365857067000515_192.168.44.118.wav");
         String outputFile = "..//WavMetadataReader//output//metaDataCollector.txt";
         MetadataSavingUtility.saveToFile(getMetadata(inputFile), outputFile, inputFile.getName());
     }
@@ -53,17 +53,17 @@ public class WavMetadataReader {
     (AudioInputStream cutting metadata and InputStream not - difference is the metadata length)
      */
     private static int byteLengthDifference(InputStream inputStream, AudioInputStream audioInputStream) {
-        int byteLenght = 0; // typo
+        int byteLength = 0; //corrected typo
         if (inputStream != null && audioInputStream != null) {
             try {
-                byteLenght = inputStream.available() - audioInputStream.available();
+                byteLength = inputStream.available() - audioInputStream.available();
             } catch (IOException e) {
-                logger.error("Caught exception", e);
+                logger.error("Caught exception: ", e);
             }
         }
-        if (byteLenght!=0) {
-            return byteLenght;
-        } { // what the language construction is that?
+        if (byteLength!=0) {
+            return byteLength;
+        } else { //Added else, my bad
             logger.warn("No metadata found");
             return 0;
         }
@@ -73,22 +73,22 @@ public class WavMetadataReader {
     /*Building string for final result of this class
     Pattern: Date Time Phone Operator Filename
      */
-    // Use StringBuilder in method below
+    // Replaced with a string builder, need to clarify why not stringBuffer
     private static String resultSorter (File inputFile, String stringMetadata) {
-        String formatedResult = getMetadataPart(stringMetadata, "\\d{4}/\\d{2}/\\d{2}")
-                + " " + getMetadataPart(stringMetadata, "\\d{2}:\\d{2}:\\d{2}")
-                + " " + getMetadataPart(stringMetadata, "\\+\\d{10}")
-                + " " + getMetadataPart(stringMetadata, "Extn\\d{3}")
-                + " " + inputFile.getName();
-        return formatedResult;
+        StringBuilder formatedResult = new StringBuilder();
+        formatedResult.append(getMetadataPart(stringMetadata, "\\d{4}/\\d{2}/\\d{2}")).append(" ")
+                .append(getMetadataPart(stringMetadata, "\\d{2}:\\d{2}:\\d{2}")).append(" ")
+                .append(getMetadataPart(stringMetadata, "\\+\\d{10}")).append(" ")
+                .append(getMetadataPart(stringMetadata, "Extn\\d{3}")).append(" ")
+                .append(inputFile.getName());
+        return formatedResult.toString();
     }
 
     /*
-    get string from found metadata
+    getting string from found metadata
      */
     private static String getMetadataPart (String stringMetadata, String regExPattern) {
         String metadataPart = null;
-        //10 symbols after + will not cover all variants
         Pattern pattern = Pattern.compile(regExPattern);
         Matcher matcher = pattern.matcher(stringMetadata);
         if (matcher.find()) {
