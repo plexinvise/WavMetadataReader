@@ -86,6 +86,7 @@ public class WavMetadataReader {
     Pattern: Date Time Phone Operator Filename
      */
     // Replaced with a string builder, need to clarify why not stringBuffer
+    // Answer: http://stackoverflow.com/questions/355089/difference-between-stringbuilder-and-stringbuffer
     private static String resultSorter (File inputFile, String stringMetadata) {
         StringBuilder formatedResult = new StringBuilder();
         formatedResult.append(getMetadataPart(stringMetadata, "\\d{4}/\\d{2}/\\d{2}")).append(" ")
