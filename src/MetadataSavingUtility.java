@@ -13,7 +13,7 @@ public class MetadataSavingUtility {
 
     private static File inputFile;
     // use getClass() method as parameter for logger. It would help to get proper logging in case of class extension in future
-    //Changed, need more details about logger
+    //Changed, need more details about logger     
     static Logger logger = Logger.getLogger(MetadataSavingUtility.class);
 
 
@@ -26,12 +26,15 @@ public class MetadataSavingUtility {
         //Checking if the file is existing file
         if (inputFile.exists() && inputFile.isFile()) {
             // As understood it is for making changes easily?
+            // TBD
             List outputArray = new ArrayList(FileUtils.readLines(inputFile, "UTF-8"));
             //Checking if we already stored this file metadata
             if (!isDuplicate((ArrayList<String>) outputArray, inputFileName)) {
                 //writing to file with append mode true
                 writeToFile(stringToSave, destFilePath);
                 logger.info("File "+inputFileName+" processed");
+                // it's better to use bracets for all constructions like if/else/for/etc, cause it 
+                // simplifies reading
             } else logger.info("File "+inputFileName+" already has been processed");
         } else {
             //in case file not exist
@@ -56,6 +59,7 @@ public class MetadataSavingUtility {
             }
             if (inputFile.createNewFile()) {
                     return true;
+                // use CTRL+ALT+L in Idea for text formatting
                 }
             logger.error("Unable to create/access output file");
             return false;
@@ -71,6 +75,7 @@ public class MetadataSavingUtility {
             FileWriter writer = new FileWriter(destFilePath, true);
             // better to use 'write' method once - when you call it two times instead of one, it executes twice as long as one. 
             // that would be cause of bad performance in future. 
+            // not fixed
             writer.write(stringToSave);
             writer.write(System.lineSeparator());
             writer.close();
@@ -84,10 +89,16 @@ public class MetadataSavingUtility {
      */
     // It would be better to use primitive 'boolean' as return type in the following method. 
     // Object 'Boolean' datatype means that result could be null, which is not true
+    
+    // 1. Changing type of first parameter let you get rid of casts in method calling.
+    // usage of concrete implementation of java.util.List, such as ArrayList,
+    // is nessecary only of you planning to use ArrayList-specific methods. 
+    // In other cases it's better to use List
+    
+    // 2. Rename method. Only you understands what 'isDuplicate' check preformed there
     private static Boolean isDuplicate(ArrayList<String> list, String inputFileName) {
         Pattern pattern = Pattern.compile(inputFileName, Pattern.CASE_INSENSITIVE);        
-        for (String line : list
-                ) {
+        for (String line : list) {
             if (pattern.matcher(line).find()) {
                 return true;
             }
