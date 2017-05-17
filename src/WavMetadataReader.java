@@ -100,6 +100,8 @@ public class WavMetadataReader {
     /*
     getting string from found metadata
      */
+    // in case of matcher.find() == false you will get "null" strings in the method above.
+    // it would be better to return empty string
     private static String getMetadataPart (String stringMetadata, String regExPattern) {
         String metadataPart = null;
         Pattern pattern = Pattern.compile(regExPattern);
