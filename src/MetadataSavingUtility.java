@@ -51,14 +51,14 @@ public class MetadataSavingUtility {
     // Object 'Boolean' datatype means that result could be null, which is not true
     //That was typo that I did not even mentioned, fixed
     private static boolean createFile() throws IOException {
-        if (!inputFile.getParentFile().exists()) {
-            inputFile.getParentFile().mkdir();
-            if (inputFile.createNewFile()) {
-                return true;
+            if (!inputFile.getParentFile().exists()) {
+                inputFile.getParentFile().mkdir();
             }
-        }
-
-        return false;
+            if (inputFile.createNewFile()) {
+                    return true;
+                }
+            logger.error("Unable to create/access output file");
+            return false;
     }
 
     /*

@@ -21,7 +21,7 @@ public class WavMetadataReader {
 
     public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
         PropertyConfigurator.configure("..//WavMetadataReader//log4j.properties");
-        File inputFile = new File("..//WavMetadataReader//wavInputFiles//MSG365857067000515_192.168.44.118.wav");
+        File inputFile = new File("..//WavMetadataReader//wavInputFiles//MSG365857069500516_192.168.44.118.wav");
         String outputFile = "..//WavMetadataReader//output//metaDataCollector.txt";
         MetadataSavingUtility.saveToFile(getMetadata(inputFile), outputFile, inputFile.getName());
     }
