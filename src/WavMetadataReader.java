@@ -2,8 +2,6 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.*;
-
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import org.apache.log4j.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -102,8 +100,9 @@ public class WavMetadataReader {
      */
     // in case of matcher.find() == false you will get "null" strings in the method above.
     // it would be better to return empty string
+    // fixed but need to discuss
     private static String getMetadataPart (String stringMetadata, String regExPattern) {
-        String metadataPart = null;
+        String metadataPart = "";
         Pattern pattern = Pattern.compile(regExPattern);
         Matcher matcher = pattern.matcher(stringMetadata);
         if (matcher.find()) {

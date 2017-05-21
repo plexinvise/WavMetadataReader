@@ -29,13 +29,15 @@ public class MetadataSavingUtility {
             // TBD
             List outputArray = new ArrayList(FileUtils.readLines(inputFile, "UTF-8"));
             //Checking if we already stored this file metadata
-            if (!isDuplicate((ArrayList<String>) outputArray, inputFileName)) {
+            if (!isAlreadyProcessed(outputArray, inputFileName)) {
                 //writing to file with append mode true
                 writeToFile(stringToSave, destFilePath);
-                logger.info("File "+inputFileName+" processed");
+                logger.info("File " + inputFileName + " processed");
                 // it's better to use bracets for all constructions like if/else/for/etc, cause it 
                 // simplifies reading
-            } else logger.info("File "+inputFileName+" already has been processed");
+            } else {
+                logger.info("File " + inputFileName + " already has been processed");
+            }
         } else {
             //in case file not exist
             if (createFile()) {
@@ -48,21 +50,20 @@ public class MetadataSavingUtility {
 
     /*
     Creating file in specified path, if parent directory not exist - creating it too
-    Returning Boolean to make sure that file created and we can use recursive call in saveToFile method
+    Returning boolean to make sure that file created and we can use recursive call in saveToFile method
      */
     // It would be better to use primitive 'boolean' as return type in the following method. 
     // Object 'Boolean' datatype means that result could be null, which is not true
-    //That was typo that I did not even mentioned, fixed
+    //That was typo that I did not even mentioned, fixed (Looks like it was not typo as the same error in other method)
     private static boolean createFile() throws IOException {
-            if (!inputFile.getParentFile().exists()) {
-                inputFile.getParentFile().mkdir();
-            }
-            if (inputFile.createNewFile()) {
-                    return true;
-                // use CTRL+ALT+L in Idea for text formatting
-                }
-            logger.error("Unable to create/access output file");
-            return false;
+        if (!inputFile.getParentFile().exists()) {
+            inputFile.getParentFile().mkdir();
+        }
+        if (inputFile.createNewFile()) {
+            return true;
+        }
+        logger.error("Unable to create/access output file");
+        return false;
     }
 
     /*
@@ -73,14 +74,11 @@ public class MetadataSavingUtility {
         //Just in case file is not writable
         if (inputFile.canWrite()) {
             FileWriter writer = new FileWriter(destFilePath, true);
-            // better to use 'write' method once - when you call it two times instead of one, it executes twice as long as one. 
-            // that would be cause of bad performance in future. 
-            // not fixed
-            writer.write(stringToSave);
-            writer.write(System.lineSeparator());
+            //Fixed, writing in one write() use
+            writer.write(stringToSave + "\n");
             writer.close();
         } else {
-            logger.warn("Can not access file "+destFilePath+". Make sure file is not locked");
+            logger.warn("Can not access file " + destFilePath + ". Make sure file is not locked");
         }
     }
 
@@ -89,15 +87,17 @@ public class MetadataSavingUtility {
      */
     // It would be better to use primitive 'boolean' as return type in the following method. 
     // Object 'Boolean' datatype means that result could be null, which is not true
-    
+
     // 1. Changing type of first parameter let you get rid of casts in method calling.
     // usage of concrete implementation of java.util.List, such as ArrayList,
     // is nessecary only of you planning to use ArrayList-specific methods. 
     // In other cases it's better to use List
-    
-    // 2. Rename method. Only you understands what 'isDuplicate' check preformed there
-    private static Boolean isDuplicate(ArrayList<String> list, String inputFileName) {
-        Pattern pattern = Pattern.compile(inputFileName, Pattern.CASE_INSENSITIVE);        
+
+    //Changed but it is still initialized as ArrayList
+
+    // 2. Rename method. Done
+    private static boolean isAlreadyProcessed(List<String> list, String inputFileName) {
+        Pattern pattern = Pattern.compile(inputFileName, Pattern.CASE_INSENSITIVE);
         for (String line : list) {
             if (pattern.matcher(line).find()) {
                 return true;
