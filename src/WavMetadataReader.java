@@ -3,6 +3,8 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.*;
 import org.apache.log4j.Logger;
+
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.*;
@@ -17,11 +19,29 @@ public class WavMetadataReader {
 
     static Logger logger = Logger.getLogger(WavMetadataReader.class);
 
-    public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
-        PropertyConfigurator.configure("..//WavMetadataReader//log4j.properties");
-        File inputFile = new File("..//WavMetadataReader//wavInputFiles//MSG365857069500516_192.168.44.118.wav");
-        String outputFile = "..//WavMetadataReader//output//metaDataCollector.txt";
-        MetadataSavingUtility.saveToFile(getMetadata(inputFile), outputFile, inputFile.getName());
+
+    public WavMetadataReader() {
+        PropertyConfigurator.configure(Variables.LOG4J_PROPS);
+    }
+
+    public static void scanFiles() throws IOException, UnsupportedAudioFileException {
+    Date lastModifiedDate = new Date(0);
+
+    // Checking last modified date for output file to process newer files only
+        File outputFile = new File(Variables.OUTPUT_FILE_PATH);
+        if (outputFile.exists()) {
+            lastModifiedDate = new Date(outputFile.lastModified());
+        }
+
+        // getting all files in the folder and processing if they are newer then output
+        for (File file: new File(Variables.WAV_INPUT_FOLDER).listFiles()) {
+
+            // Next step to clarify, whether files might be older
+            if (FileUtils.isFileNewer(file, lastModifiedDate)) {
+                MetadataSavingUtility.saveToFile(getMetadata(file), Variables.OUTPUT_FILE_PATH, file.getName());
+
+            }
+        }
     }
 
     private static String getMetadata(File inputFile) throws java.io.IOException, UnsupportedAudioFileException {
@@ -35,11 +55,7 @@ public class WavMetadataReader {
         try {
             metadataBytes = new byte[byteLengthDifference(inputStream, audioInputStream)];
         } catch (IllegalArgumentException error) {
-
-            /*
-             Need to discuss how to make this output more friendly
-             This mechanism is to prevent writing null values into file if no metadata found
-             */
+            //This mechanism is to prevent writing null values into file if no metadata found
             logger.error("No metadata found, execution will be aborted for "+inputFile.getName(), error);
             throw error;
         }
@@ -64,7 +80,7 @@ public class WavMetadataReader {
     (AudioInputStream cutting metadata and InputStream not - difference is the metadata length)
      */
     private static int byteLengthDifference(InputStream inputStream, AudioInputStream audioInputStream) {
-        int byteLength = 0; //corrected typo
+        int byteLength = 0;
         if (inputStream != null && audioInputStream != null) {
             try {
                 byteLength = inputStream.available() - audioInputStream.available();
@@ -74,7 +90,7 @@ public class WavMetadataReader {
         }
         if (byteLength!=0) {
             return byteLength;
-        } else { //Added else, my bad
+        } else {
             throw new IllegalArgumentException();
         }
 
@@ -83,8 +99,6 @@ public class WavMetadataReader {
     /*Building string for final result of this class
     Pattern: Date Time Phone Operator Filename
      */
-    // Replaced with a string builder, need to clarify why not stringBuffer
-    // Answer: http://stackoverflow.com/questions/355089/difference-between-stringbuilder-and-stringbuffer
     private static String resultSorter (File inputFile, String stringMetadata) {
         StringBuilder formatedResult = new StringBuilder();
         formatedResult.append(getMetadataPart(stringMetadata, "\\d{4}/\\d{2}/\\d{2}")).append(" ")
@@ -98,9 +112,6 @@ public class WavMetadataReader {
     /*
     getting string from found metadata
      */
-    // in case of matcher.find() == false you will get "null" strings in the method above.
-    // it would be better to return empty string
-    // fixed but need to discuss
     private static String getMetadataPart (String stringMetadata, String regExPattern) {
         String metadataPart = "";
         Pattern pattern = Pattern.compile(regExPattern);

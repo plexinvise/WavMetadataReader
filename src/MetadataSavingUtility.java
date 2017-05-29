@@ -3,6 +3,7 @@ import org.apache.log4j.PropertyConfigurator;
 import java.io.*;
 import java.util.ArrayList;
 import org.apache.log4j.Logger;
+
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -12,8 +13,6 @@ import java.util.regex.Pattern;
 public class MetadataSavingUtility {
 
     private static File inputFile;
-    // use getClass() method as parameter for logger. It would help to get proper logging in case of class extension in future
-    //Changed, need more details about logger     
     static Logger logger = Logger.getLogger(MetadataSavingUtility.class);
 
 
@@ -21,27 +20,23 @@ public class MetadataSavingUtility {
     Saving inputString to file, checking if file is not processed
      */
     public static void saveToFile(String stringToSave, String destFilePath, String inputFileName) throws IOException {
-        PropertyConfigurator.configure("..//WavMetadataReader//log4j.properties");
+        PropertyConfigurator.configure(Variables.LOG4J_PROPS);
         inputFile = new File(destFilePath);
         //Checking if the file is existing file
         if (inputFile.exists() && inputFile.isFile()) {
-            // As understood it is for making changes easily?
-            // TBD
             List outputArray = new ArrayList(FileUtils.readLines(inputFile, "UTF-8"));
             //Checking if we already stored this file metadata
             if (!isAlreadyProcessed(outputArray, inputFileName)) {
                 //writing to file with append mode true
                 writeToFile(stringToSave, destFilePath);
                 logger.info("File " + inputFileName + " processed");
-                // it's better to use bracets for all constructions like if/else/for/etc, cause it 
-                // simplifies reading
             } else {
                 logger.info("File " + inputFileName + " already has been processed");
             }
         } else {
             //in case file not exist
             if (createFile()) {
-                //ACHTUNG!!! RECURSION DETECTED!!!
+                //Regression call
                 saveToFile(stringToSave, destFilePath, inputFileName);
 
             }
@@ -52,9 +47,6 @@ public class MetadataSavingUtility {
     Creating file in specified path, if parent directory not exist - creating it too
     Returning boolean to make sure that file created and we can use recursive call in saveToFile method
      */
-    // It would be better to use primitive 'boolean' as return type in the following method. 
-    // Object 'Boolean' datatype means that result could be null, which is not true
-    //That was typo that I did not even mentioned, fixed (Looks like it was not typo as the same error in other method)
     private static boolean createFile() throws IOException {
         if (!inputFile.getParentFile().exists()) {
             inputFile.getParentFile().mkdir();
@@ -74,7 +66,6 @@ public class MetadataSavingUtility {
         //Just in case file is not writable
         if (inputFile.canWrite()) {
             FileWriter writer = new FileWriter(destFilePath, true);
-            //Fixed, writing in one write() use
             writer.write(stringToSave + "\n");
             writer.close();
         } else {
@@ -85,17 +76,6 @@ public class MetadataSavingUtility {
     /*
     Checking if we have this string in the file
      */
-    // It would be better to use primitive 'boolean' as return type in the following method. 
-    // Object 'Boolean' datatype means that result could be null, which is not true
-
-    // 1. Changing type of first parameter let you get rid of casts in method calling.
-    // usage of concrete implementation of java.util.List, such as ArrayList,
-    // is nessecary only of you planning to use ArrayList-specific methods. 
-    // In other cases it's better to use List
-
-    //Changed but it is still initialized as ArrayList
-
-    // 2. Rename method. Done
     private static boolean isAlreadyProcessed(List<String> list, String inputFileName) {
         Pattern pattern = Pattern.compile(inputFileName, Pattern.CASE_INSENSITIVE);
         for (String line : list) {

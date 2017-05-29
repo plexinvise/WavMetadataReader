@@ -1,0 +1,5 @@
+This program is getting metadata from the files located in WavInputFiles folder. 
+
+Short command description:
+- Run - running execution, if new files appeared - they are will be processed
+- Exit - exiting application
