@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.*;
 import org.apache.log4j.PropertyConfigurator;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -58,6 +59,7 @@ public class WavMetadataReader {
         }
     }
 
+    @NotNull
     private String getMetadata(File inputFile) throws java.io.IOException, UnsupportedAudioFileException {
 
         //Creating streams to find how much bytes metadata takes

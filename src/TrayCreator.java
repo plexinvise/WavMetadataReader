@@ -106,6 +106,7 @@ class RunTray extends Thread {
         PropertyConfigurator.configure(IVariables.LOG4J_PROPS);
     }
 
+    @Override
     public void run() {
         try {
             new TrayCreator().trayInit();
