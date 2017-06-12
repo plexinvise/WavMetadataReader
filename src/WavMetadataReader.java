@@ -117,6 +117,7 @@ public class WavMetadataReader {
     /*Building string for final result of this class
     Pattern: Date Time Phone Operator Filename
      */
+    @NotNull
     private String resultSorter(File inputFile, String stringMetadata) {
         StringBuilder formatedResult = new StringBuilder();
         formatedResult.append(getMetadataPart(stringMetadata, "\\d{4}/\\d{2}/\\d{2}")).append(" ")
