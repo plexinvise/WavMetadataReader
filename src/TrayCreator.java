@@ -16,16 +16,20 @@ import javax.swing.*;
  */
 public class TrayCreator {
 
-    private static String about;
-    static WavMetadataReader wavReader;
-    static Logger logger = Logger.getLogger(WavMetadataReader.class);
-
+    private String about;
+    WavMetadataReader wavReader;
+    static Logger logger = Logger.getLogger(TrayCreator.class);
 
     public TrayCreator() {
-        PropertyConfigurator.configure(Variables.LOG4J_PROPS);
+        PropertyConfigurator.configure(IVariables.LOG4J_PROPS);
     }
 
+    //Running trayInit as Thread
     public static void main(String[] args) throws IOException {
+        (new RunTray()).start();
+    }
+
+    protected void trayInit() throws IOException {
         wavReader = new WavMetadataReader();
         StringBuilder builder = new StringBuilder();
         about = builder.append(FileUtils.readFileToString(
@@ -36,8 +40,11 @@ public class TrayCreator {
             System.out.println("SystemTray is not supported");
             return;
         }
+
+        //SystemTray and PopupMenu is final cause it is only might be initialized once
+        //TrayIcon might be changed during the program running
         final PopupMenu popup = new PopupMenu();
-        final TrayIcon trayIcon =
+        TrayIcon trayIcon =
                 new TrayIcon(Toolkit.getDefaultToolkit().createImage(
                         "..//WavMetadataReader//1496030759_CAD.png"));
         final SystemTray tray = SystemTray.getSystemTray();
@@ -88,4 +95,23 @@ public class TrayCreator {
             }
         });
     }
+}
+
+//initialized new class extending Thread
+class RunTray extends Thread {
+
+    static Logger logger = Logger.getLogger(RunTray.class);
+
+    public RunTray() {
+        PropertyConfigurator.configure(IVariables.LOG4J_PROPS);
+    }
+
+    public void run() {
+        try {
+            new TrayCreator().trayInit();
+        } catch (IOException e) {
+            logger.error(e);
+        }
+    }
+
 }
