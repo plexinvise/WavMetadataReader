@@ -1,3 +1,15 @@
+/**
+ * TrayCreator class purpose is to run program in the thread
+ * and wrap it with tray icon so user can interact and start a new program run
+ * by clicking on the menu item. On this stage methods in the class
+ * creating Menu with 3 options: Run, About, Exit
+ * Run - calling method scanFiles() from the WavMetadataReader class
+ * About - showing JPanel with text String about which stored in the about.txt file
+ * Exit - Removing trayIcon and calling System.exit so the program execution stopping
+ *
+ * Created by plexinvise on 5/28/17.
+ */
+
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -10,26 +22,31 @@ import java.io.IOException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 
-
-/**
- * Created by plexinvise on 5/28/17.
- */
 public class TrayCreator {
 
     private String about;
-    WavMetadataReader wavReader;
-    static Logger logger = Logger.getLogger(TrayCreator.class);
+    private WavMetadataReader wavReader;
+    private static Logger logger = Logger.getLogger(TrayCreator.class);
 
     public TrayCreator() {
-        PropertyConfigurator.configure(IVariables.LOG4J_PROPS);
+        PropertyConfigurator.configure(Constants.LOG4J_PROPS);
     }
 
-    //Running trayInit as Thread
+    //Running trayInit with SwingUtilities method
     public static void main(String[] args) throws IOException {
-        (new RunTray()).start();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    new TrayCreator().trayInit();
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+            }
+        });
     }
 
-    protected void trayInit() throws IOException {
+    private void trayInit() throws IOException {
         wavReader = new WavMetadataReader();
         StringBuilder builder = new StringBuilder();
         about = builder.append(FileUtils.readFileToString(
@@ -95,24 +112,4 @@ public class TrayCreator {
             }
         });
     }
-}
-
-//initialized new class extending Thread
-class RunTray extends Thread {
-
-    static Logger logger = Logger.getLogger(RunTray.class);
-
-    public RunTray() {
-        PropertyConfigurator.configure(IVariables.LOG4J_PROPS);
-    }
-
-    @Override
-    public void run() {
-        try {
-            new TrayCreator().trayInit();
-        } catch (IOException e) {
-            logger.error(e);
-        }
-    }
-
 }

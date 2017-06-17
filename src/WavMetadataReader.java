@@ -1,44 +1,55 @@
+/**
+ * WavMetadataReared class contain main logic which is getting metadata
+ * from .wav file and extracting it to the string. Contain next methods:
+ * - scanFiles() - Scanning all wav files in the specified folder
+ * and extracting metadata from them.
+ * - getMetadata(File inputFile) - taking .wav file as inputFile
+ * and returning full metadata piece from it as a String.
+ * - byteLengthDifference(InputStream inputStream, AudioInputStream audioInputStream) -
+ * calculating byteLength of metadata in .wav file using features of
+ * input streams.
+ * - resultSorter(File inputFile, String stringMetadata) - taking stringMetadata and
+ * getting pieces of info we need with regexp. Adding inputFile name at the end of returned
+ * string so return of this method is already formatted string which we can save.
+ * - getMetadataPart(String stringMetadata, String regExPattern) - service method
+ * which getting string part from stringMetadata using regExPattern.
+ *
+ * Created by plexinvise on 4/12/17.
+ */
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
+
 import java.io.*;
-
-import org.apache.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.*;
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.commons.io.*;
 import org.jetbrains.annotations.NotNull;
-
-
-/**
- * Created by plexinvise on 4/12/17.
- */
 
 public class WavMetadataReader {
 
-    static Logger logger = Logger.getLogger(WavMetadataReader.class);
-    MetadataSavingUtility metadataSavingUtility = new MetadataSavingUtility();
-
+    private static Logger logger = Logger.getLogger(WavMetadataReader.class);
 
     public WavMetadataReader() {
-        PropertyConfigurator.configure(IVariables.LOG4J_PROPS);
+        PropertyConfigurator.configure(Constants.LOG4J_PROPS);
     }
 
     public void scanFiles() throws IOException, UnsupportedAudioFileException {
 
-        File outputFile = new File(IVariables.OUTPUT_FILE_PATH);
+        File outputFile = new File(Constants.OUTPUT_FILE_PATH);
         if (!outputFile.exists()) {
-            metadataSavingUtility.createFile(outputFile);
+            MetadataSavingUtility.createFile(outputFile);
         }
         List outputArray = new ArrayList(FileUtils.readLines(outputFile, "UTF-8"));
 
         //Getting files list in order to process them in the loop below
-        File[] allFiles = new File(IVariables.WAV_INPUT_FOLDER).listFiles();
+        File[] allFiles = new File(Constants.WAV_INPUT_FOLDER).listFiles();
 
         // getting all files in the folder and processing if they are newer then output
         for (File file : allFiles) {
@@ -48,13 +59,13 @@ public class WavMetadataReader {
                 logger.info("File " + file.getName() + " is not WAV file");
                 continue;
             }
-            if (metadataSavingUtility.isAlreadyProcessed(outputArray, file.getName())) {
+            if (MetadataSavingUtility.isAlreadyProcessed(outputArray, file.getName())) {
                 logger.info("File " + file.getName() + " has already been processed");
                 continue;
             }
 
             //Obtaining metadata and saving it to the file
-            metadataSavingUtility.saveToFile(getMetadata(file), outputFile, file.getName());
+            MetadataSavingUtility.saveToFile(getMetadata(file), outputFile, file.getName());
 
         }
     }
