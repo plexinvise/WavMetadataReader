@@ -1,0 +1,30 @@
+apply plugin: 'java'
+
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    includeInJar
+}
+
+dependencies {
+    includeInJar group: 'com.github.adedayo.intellij.sdk', name: 'annotations-java8', version: '142.1'
+    includeInJar group: 'commons-io', name: 'commons-io', version: '2.5'
+    includeInJar group: 'log4j', name: 'log4j', version: '1.2.17'
+
+    configurations.compile.extendsFrom(configurations.includeInJar)
+}
+
+jar {
+    manifest {
+        attributes('Main-Class': 'TrayCreator')
+    }
+
+    from {
+        configurations.includeInJar.collect{
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}

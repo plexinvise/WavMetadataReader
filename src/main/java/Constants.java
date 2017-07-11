@@ -3,6 +3,7 @@
  *
  * Created by plexinvise on 6/11/17.
  */
+
 public interface Constants {
 
     String WAV_INPUT_FOLDER = "..//WavMetadataReader//wavInputFiles//";
