@@ -18,6 +18,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.net.URISyntaxException;
 import java.util.Properties;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -32,9 +33,13 @@ public class TrayCreator {
     private InputStream propIn = null;
 
     public TrayCreator() throws IOException {
-        propIn = new FileInputStream("constants.properties");
+        propIn = new FileInputStream(".//constants.properties");
         constants.load(propIn);
-        PropertyConfigurator.configure(constants.getProperty("log4jProps"));
+        if (!constants.contains("log4jProps")) {
+            PropertyConfigurator.configure(getClass().getResourceAsStream("log4j.properties"));
+        } else {
+            PropertyConfigurator.configure(constants.getProperty("log4jProps"));
+        }
     }
 
     //Running trayInit with SwingUtilities method
@@ -46,17 +51,22 @@ public class TrayCreator {
                     new TrayCreator().trayInit();
                 } catch (IOException e) {
                     logger.error(e);
+                } catch (URISyntaxException e) {
+                    logger.error(e);
                 }
             }
         });
     }
 
-    private void trayInit() throws IOException {
+    private void trayInit() throws IOException, URISyntaxException {
         wavReader = new WavMetadataReader();
         StringBuilder builder = new StringBuilder();
+
+        //Getting text for "about" dialog
         about = builder.append(FileUtils.readFileToString(
-                new File(constants.getProperty("about")), "UTF8"))
-                .toString();
+                new File(getClass().getResource("about.txt").toURI()),
+                "UTF-8")).toString();
+
         //Check the SystemTray is supported
         if (!SystemTray.isSupported()) {
             System.out.println("SystemTray is not supported");
@@ -66,9 +76,11 @@ public class TrayCreator {
         //SystemTray and PopupMenu is final cause it is only might be initialized once
         //TrayIcon might be changed during the program running
         final PopupMenu popup = new PopupMenu();
-        TrayIcon trayIcon =
-                new TrayIcon(Toolkit.getDefaultToolkit().createImage(
-                        constants.getProperty("trayIcon")));
+
+        //Will not be null
+        TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit()
+                .createImage(getClass().getResource("1496030759_CAD.png")));
+
         final SystemTray tray = SystemTray.getSystemTray();
 
         //Adding components to pop-up menu

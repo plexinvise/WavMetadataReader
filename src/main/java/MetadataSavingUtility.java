@@ -31,9 +31,13 @@ public class MetadataSavingUtility {
     Saving inputString to file, checking if file is not processed
      */
     public static void saveToFile(String stringToSave, File outputFile, String inputFileName) throws IOException {
-        propIn = new FileInputStream("constants.properties");
+        propIn = new FileInputStream(".//constants.properties");
         constants.load(propIn);
-        PropertyConfigurator.configure(constants.getProperty("log4jProps"));
+        if (!constants.contains("log4jProps")) {
+            PropertyConfigurator.configure(MetadataSavingUtility.class.getResourceAsStream("log4j.properties"));
+        } else {
+            PropertyConfigurator.configure(constants.getProperty("log4jProps"));
+        }
 
         //Checking if the file is existing file
         if (outputFile.exists() && outputFile.isFile()) {
@@ -49,9 +53,16 @@ public class MetadataSavingUtility {
     Returning boolean to make sure that file created and we can use recursive call in saveToFile method
      */
     public static boolean createFile(File outputFile) throws IOException {
-        if (!outputFile.getParentFile().exists()) {
-            outputFile.getParentFile().mkdir();
-        }
+
+        /**
+         * In case adding path manually in constants.properties - set only filename and make sure
+         * that path to file exist.
+         * Example: /user/folder/secondFolder/outputFile
+         * /user/folder/secondFolder - should be already created
+         *
+         * Otherwise this method will throw exception
+         */
+
         if (outputFile.createNewFile()) {
             logger.info("File " + outputFile.getName() + " was not exist and has been created");
             return true;

@@ -40,9 +40,13 @@ public class WavMetadataReader {
     private InputStream propIn = null;
 
     public WavMetadataReader() throws IOException {
-        propIn = new FileInputStream("constants.properties");
+        propIn = new FileInputStream(".//constants.properties");
         constants.load(propIn);
-        PropertyConfigurator.configure(constants.getProperty("log4jProps"));
+        if (!constants.contains("log4jProps")) {
+            PropertyConfigurator.configure(getClass().getResourceAsStream("log4j.properties"));
+        } else {
+            PropertyConfigurator.configure(constants.getProperty("log4jProps"));
+        }
     }
 
     public void scanFiles() throws IOException, UnsupportedAudioFileException {
