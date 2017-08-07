@@ -10,3 +10,14 @@
 #Idea files
 .idea
 *.iml
+
+#Gradle Configs
+.gradle
+
+#Gradle Wrapper
+gradle
+gradlew
+gradlew.bat
+
+#Build Files
+build

@@ -17,8 +17,9 @@ import org.apache.log4j.PropertyConfigurator;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.util.Properties;
+
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 
@@ -27,9 +28,13 @@ public class TrayCreator {
     private String about;
     private WavMetadataReader wavReader;
     private static Logger logger = Logger.getLogger(TrayCreator.class);
+    private Properties constants = new Properties();
+    private InputStream propIn = null;
 
-    public TrayCreator() {
-        PropertyConfigurator.configure(Constants.LOG4J_PROPS);
+    public TrayCreator() throws IOException {
+        propIn = new FileInputStream("constants.properties");
+        constants.load(propIn);
+        PropertyConfigurator.configure(constants.getProperty("log4jProps"));
     }
 
     //Running trayInit with SwingUtilities method
@@ -50,7 +55,7 @@ public class TrayCreator {
         wavReader = new WavMetadataReader();
         StringBuilder builder = new StringBuilder();
         about = builder.append(FileUtils.readFileToString(
-                new File("..//WavMetadataReader//about.txt"), "UTF8"))
+                new File(constants.getProperty("about")), "UTF8"))
                 .toString();
         //Check the SystemTray is supported
         if (!SystemTray.isSupported()) {
@@ -63,7 +68,7 @@ public class TrayCreator {
         final PopupMenu popup = new PopupMenu();
         TrayIcon trayIcon =
                 new TrayIcon(Toolkit.getDefaultToolkit().createImage(
-                        "..//WavMetadataReader//1496030759_CAD.png"));
+                        constants.getProperty("trayIcon")));
         final SystemTray tray = SystemTray.getSystemTray();
 
         //Adding components to pop-up menu

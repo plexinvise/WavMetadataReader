@@ -24,6 +24,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,21 +36,25 @@ import org.jetbrains.annotations.NotNull;
 public class WavMetadataReader {
 
     private static Logger logger = Logger.getLogger(WavMetadataReader.class);
+    private Properties constants = new Properties();
+    private InputStream propIn = null;
 
-    public WavMetadataReader() {
-        PropertyConfigurator.configure(Constants.LOG4J_PROPS);
+    public WavMetadataReader() throws IOException {
+        propIn = new FileInputStream("constants.properties");
+        constants.load(propIn);
+        PropertyConfigurator.configure(constants.getProperty("log4jProps"));
     }
 
     public void scanFiles() throws IOException, UnsupportedAudioFileException {
 
-        File outputFile = new File(Constants.OUTPUT_FILE_PATH);
+        File outputFile = new File(constants.getProperty("outputFilePath"));
         if (!outputFile.exists()) {
             MetadataSavingUtility.createFile(outputFile);
         }
         List outputArray = new ArrayList(FileUtils.readLines(outputFile, "UTF-8"));
 
         //Getting files list in order to process them in the loop below
-        File[] allFiles = new File(Constants.WAV_INPUT_FOLDER).listFiles();
+        File[] allFiles = new File(constants.getProperty("wavInputFolder")).listFiles();
 
         // getting all files in the folder and processing if they are newer then output
         for (File file : allFiles) {

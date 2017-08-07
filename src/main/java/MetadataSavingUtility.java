@@ -18,17 +18,22 @@ import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 public class MetadataSavingUtility {
 
     private static Logger logger = Logger.getLogger(MetadataSavingUtility.class);
+    private static Properties constants = new Properties();
+    private static InputStream propIn = null;
 
     /*
     Saving inputString to file, checking if file is not processed
      */
     public static void saveToFile(String stringToSave, File outputFile, String inputFileName) throws IOException {
-        PropertyConfigurator.configure(Constants.LOG4J_PROPS);
+        propIn = new FileInputStream("constants.properties");
+        constants.load(propIn);
+        PropertyConfigurator.configure(constants.getProperty("log4jProps"));
 
         //Checking if the file is existing file
         if (outputFile.exists() && outputFile.isFile()) {
