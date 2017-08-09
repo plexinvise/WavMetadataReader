@@ -29,7 +29,7 @@ jar {
 }
 
 task constantProps {
-    def file = new File("$buildDir/libs/version.txt")
+    def file = new File("$buildDir/libs/constants.properties")
     file.createNewFile()
     file.text = """"""
 }
