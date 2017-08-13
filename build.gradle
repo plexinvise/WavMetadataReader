@@ -28,7 +28,9 @@ jar {
     }
 }
 
-task constantProps {
+build.finalizedBy("constantProps")
+
+task constantProps doLast() {
     def file = new File("$buildDir/libs/constants.properties")
     file.createNewFile()
     file.text = """"""

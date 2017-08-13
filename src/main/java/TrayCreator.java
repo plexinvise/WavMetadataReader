@@ -10,7 +10,7 @@
  * Created by plexinvise on 5/28/17.
  */
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -18,7 +18,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.net.URISyntaxException;
 import java.util.Properties;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -30,10 +29,16 @@ public class TrayCreator {
     private WavMetadataReader wavReader;
     private static Logger logger = Logger.getLogger(TrayCreator.class);
     private Properties constants = new Properties();
-    private InputStream propIn = null;
 
     public TrayCreator() throws IOException {
-        propIn = new FileInputStream(".//constants.properties");
+        /**
+         * To run from IDE need to replace propIn initialization with
+         * InputStream propIn = new FileInputStream("./constants.properties");
+         */
+        InputStream propIn = new FileInputStream(
+                new File(getClass().getProtectionDomain().getCodeSource()
+                        .getLocation().getPath()).getParentFile().getPath()
+                        + "/constants.properties");
         constants.load(propIn);
         if (!constants.contains("log4jProps")) {
             PropertyConfigurator.configure(getClass().getResourceAsStream("log4j.properties"));
@@ -51,21 +56,20 @@ public class TrayCreator {
                     new TrayCreator().trayInit();
                 } catch (IOException e) {
                     logger.error(e);
-                } catch (URISyntaxException e) {
-                    logger.error(e);
                 }
             }
         });
     }
 
-    private void trayInit() throws IOException, URISyntaxException {
+    private void trayInit() throws IOException {
         wavReader = new WavMetadataReader();
         StringBuilder builder = new StringBuilder();
 
         //Getting text for "about" dialog
-        about = builder.append(FileUtils.readFileToString(
-                new File(getClass().getResource("about.txt").toURI()),
-                "UTF-8")).toString();
+        InputStream inputStream = getClass().getResourceAsStream("about.txt");
+        byte[] buffer = new byte[inputStream.available()];
+        IOUtils.read(inputStream, buffer);
+        about = builder.append(IOUtils.toString(buffer, "UTF-8")).toString();
 
         //Check the SystemTray is supported
         if (!SystemTray.isSupported()) {

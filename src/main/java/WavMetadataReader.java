@@ -37,10 +37,16 @@ public class WavMetadataReader {
 
     private static Logger logger = Logger.getLogger(WavMetadataReader.class);
     private Properties constants = new Properties();
-    private InputStream propIn = null;
 
     public WavMetadataReader() throws IOException {
-        propIn = new FileInputStream(".//constants.properties");
+        /**
+         * To run from IDE need to replace propIn initialization with
+         * InputStream propIn = new FileInputStream("./constants.properties");
+         */
+        InputStream propIn = new FileInputStream(
+                new File(getClass().getProtectionDomain().getCodeSource()
+                        .getLocation().getPath()).getParentFile().getPath()
+                        + "/constants.properties");
         constants.load(propIn);
         if (!constants.contains("log4jProps")) {
             PropertyConfigurator.configure(getClass().getResourceAsStream("log4j.properties"));

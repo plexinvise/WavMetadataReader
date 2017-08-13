@@ -25,13 +25,19 @@ public class MetadataSavingUtility {
 
     private static Logger logger = Logger.getLogger(MetadataSavingUtility.class);
     private static Properties constants = new Properties();
-    private static InputStream propIn = null;
 
     /*
     Saving inputString to file, checking if file is not processed
      */
     public static void saveToFile(String stringToSave, File outputFile, String inputFileName) throws IOException {
-        propIn = new FileInputStream(".//constants.properties");
+        /**
+         * To run from IDE need to replace propIn initialization with
+         * InputStream propIn = new FileInputStream("./constants.properties");
+         */
+        InputStream propIn = new FileInputStream(
+                new File(MetadataSavingUtility.class.getProtectionDomain().getCodeSource()
+                        .getLocation().getPath()).getParentFile().getPath()
+                        + "/constants.properties");
         constants.load(propIn);
         if (!constants.contains("log4jProps")) {
             PropertyConfigurator.configure(MetadataSavingUtility.class.getResourceAsStream("log4j.properties"));
