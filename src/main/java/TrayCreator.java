@@ -32,6 +32,15 @@ public class TrayCreator {
     private Properties constants = new Properties();
 
     public TrayCreator() throws IOException {
+        getProperties();
+        if (!constants.containsKey("log4jProps")) {
+            PropertyConfigurator.configure(getClass().getResourceAsStream("log4j.properties"));
+        } else {
+            PropertyConfigurator.configure(constants.getProperty("log4jProps"));
+        }
+    }
+
+    private void getProperties () throws IOException {
         /*
          * To run from IDE need to replace propIn initialization with
          * InputStream propIn = new FileInputStream("./constants.properties");
@@ -40,12 +49,8 @@ public class TrayCreator {
                 new File(getClass().getProtectionDomain().getCodeSource()
                         .getLocation().getPath()).getParentFile().getPath()
                         + "/constants.properties");
-        constants.load(propIn);
-        if (!constants.contains("log4jProps")) {
-            PropertyConfigurator.configure(getClass().getResourceAsStream("log4j.properties"));
-        } else {
-            PropertyConfigurator.configure(constants.getProperty("log4jProps"));
-        }
+        this.constants.load(propIn);
+        propIn.close();
     }
 
     //Running trayInit with SwingUtilities method
@@ -114,15 +119,17 @@ public class TrayCreator {
 
         run.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (constants.contains("wavInputFolder")&&constants.contains("outputFilePath")) {
-                    try {
+                try {
+                    getProperties();
+
+                    if (constants.containsKey("wavInputFolder") && constants.containsKey("outputFilePath")) {
                         wavReader.scanFiles();
-                    } catch (IOException | UnsupportedAudioFileException e1) {
-                        logger.error(e1);
+                    } else {
+                        JOptionPane.showMessageDialog(null,
+                                "Run settings first to configure input and output paths");
                     }
-                } else {
-                    JOptionPane.showMessageDialog(null,
-                            "Run settings first to configure input and output paths");
+                } catch (IOException | UnsupportedAudioFileException e1) {
+                    logger.error(e1);
                 }
             }
         });

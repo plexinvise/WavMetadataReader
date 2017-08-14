@@ -35,20 +35,14 @@ import org.jetbrains.annotations.NotNull;
 
 public class WavMetadataReader {
 
+    private TrayCreator trayCreator = new TrayCreator();
     private static Logger logger = Logger.getLogger(WavMetadataReader.class);
     private Properties constants = new Properties();
 
     public WavMetadataReader() throws IOException {
-        /*
-         * To run from IDE need to replace propIn initialization with
-         * InputStream propIn = new FileInputStream("./constants.properties");
-         */
-        InputStream propIn = new FileInputStream(
-                new File(getClass().getProtectionDomain().getCodeSource()
-                        .getLocation().getPath()).getParentFile().getPath()
-                        + "/constants.properties");
-        constants.load(propIn);
-        if (!constants.contains("log4jProps")) {
+        getProperties();
+
+        if (!constants.containsKey("log4jProps")) {
             PropertyConfigurator.configure(getClass().getResourceAsStream("log4j.properties"));
         } else {
             PropertyConfigurator.configure(constants.getProperty("log4jProps"));
@@ -56,6 +50,7 @@ public class WavMetadataReader {
     }
 
     public void scanFiles() throws IOException, UnsupportedAudioFileException {
+        getProperties();
 
         File outputFile = new File(constants.getProperty("outputFilePath"));
         if (!outputFile.exists()) {
@@ -165,5 +160,18 @@ public class WavMetadataReader {
             metadataPart = matcher.group(0);
         }
         return metadataPart;
+    }
+
+    private void getProperties () throws IOException {
+        /*
+         * To run from IDE need to replace propIn initialization with
+         * InputStream propIn = new FileInputStream("./constants.properties");
+         */
+        InputStream propIn = new FileInputStream(
+                new File(getClass().getProtectionDomain().getCodeSource()
+                        .getLocation().getPath()).getParentFile().getPath()
+                        + "/constants.properties");
+        constants.load(propIn);
+        propIn.close();
     }
 }

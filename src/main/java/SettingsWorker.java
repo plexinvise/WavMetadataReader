@@ -17,6 +17,7 @@ import java.io.*;
 import java.util.Properties;
 
 public class SettingsWorker {
+    private TrayCreator trayCreator = new TrayCreator();
     private JButton chooseOutput;
     private JButton chooseInput;
     private JFileChooser chooser;
@@ -24,17 +25,9 @@ public class SettingsWorker {
     private Properties constants = new Properties();
 
     public SettingsWorker() throws IOException {
-        /*
-         * To run from IDE need to replace propIn initialization with
-         * InputStream propIn = new FileInputStream("./constants.properties");
-         */
-        InputStream propIn = new FileInputStream(
-                new File(getClass().getProtectionDomain().getCodeSource()
-                        .getLocation().getPath()).getParentFile().getPath()
-                        + "/constants.properties");
+        getProperties();
 
-        constants.load(propIn);
-        if (!constants.contains("log4jProps")) {
+        if (!constants.containsKey("log4jProps")) {
             PropertyConfigurator.configure(getClass().getResourceAsStream("log4j.properties"));
         } else {
             PropertyConfigurator.configure(constants.getProperty("log4jProps"));
@@ -104,6 +97,15 @@ public class SettingsWorker {
 
                     writeProperties("outputFilePath", chooser.getSelectedFile().getAbsolutePath());
 
+                    File file = new File(chooser.getSelectedFile().getAbsolutePath());
+                    if (!file.exists()) {
+                        try {
+                            MetadataSavingUtility.createFile(file);
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+
                     textArea.append("Output file path set to: "
                             + chooser.getSelectedFile().getAbsolutePath() + "\n");
                 } else {
@@ -133,6 +135,19 @@ public class SettingsWorker {
             logger.error(e);
         }
 
+    }
+
+    private void getProperties () throws IOException {
+        /*
+         * To run from IDE need to replace propIn initialization with
+         * InputStream propIn = new FileInputStream("./constants.properties");
+         */
+        InputStream propIn = new FileInputStream(
+                new File(getClass().getProtectionDomain().getCodeSource()
+                        .getLocation().getPath()).getParentFile().getPath()
+                        + "/constants.properties");
+        this.constants.load(propIn);
+        propIn.close();
     }
 }
 

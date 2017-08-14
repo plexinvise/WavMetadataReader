@@ -30,16 +30,9 @@ public class MetadataSavingUtility {
     Saving inputString to file, checking if file is not processed
      */
     public static void saveToFile(String stringToSave, File outputFile, String inputFileName) throws IOException {
-        /*
-         * To run from IDE need to replace propIn initialization with
-         * InputStream propIn = new FileInputStream("./constants.properties");
-         */
-        InputStream propIn = new FileInputStream(
-                new File(MetadataSavingUtility.class.getProtectionDomain().getCodeSource()
-                        .getLocation().getPath()).getParentFile().getPath()
-                        + "/constants.properties");
-        constants.load(propIn);
-        if (!constants.contains("log4jProps")) {
+        getProperties();
+
+        if (!constants.containsKey("log4jProps")) {
             PropertyConfigurator.configure(MetadataSavingUtility.class.getResourceAsStream("log4j.properties"));
         } else {
             PropertyConfigurator.configure(constants.getProperty("log4jProps"));
@@ -102,5 +95,19 @@ public class MetadataSavingUtility {
             }
         }
         return false;
+    }
+
+    // Need to replace methods getProperty on every class with something common. Abstract class?
+    public static void getProperties () throws IOException {
+        /*
+         * To run from IDE need to replace propIn initialization with
+         * InputStream propIn = new FileInputStream("./constants.properties");
+         */
+        InputStream propIn = new FileInputStream(
+                new File(MetadataSavingUtility.class.getProtectionDomain().getCodeSource()
+                        .getLocation().getPath()).getParentFile().getPath()
+                        + "/constants.properties");
+        constants.load(propIn);
+        propIn.close();
     }
 }
