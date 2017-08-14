@@ -39,7 +39,7 @@ public class WavMetadataReader {
     private Properties constants = new Properties();
 
     public WavMetadataReader() throws IOException {
-        /**
+        /*
          * To run from IDE need to replace propIn initialization with
          * InputStream propIn = new FileInputStream("./constants.properties");
          */

@@ -30,7 +30,7 @@ public class MetadataSavingUtility {
     Saving inputString to file, checking if file is not processed
      */
     public static void saveToFile(String stringToSave, File outputFile, String inputFileName) throws IOException {
-        /**
+        /*
          * To run from IDE need to replace propIn initialization with
          * InputStream propIn = new FileInputStream("./constants.properties");
          */
@@ -60,7 +60,7 @@ public class MetadataSavingUtility {
      */
     public static boolean createFile(File outputFile) throws IOException {
 
-        /**
+        /*
          * In case adding path manually in constants.properties - set only filename and make sure
          * that path to file exist.
          * Example: /user/folder/secondFolder/outputFile

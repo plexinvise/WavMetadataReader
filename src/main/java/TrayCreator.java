@@ -27,11 +27,12 @@ public class TrayCreator {
 
     private String about;
     private WavMetadataReader wavReader;
+    private SettingsWorker settingsWorker;
     private static Logger logger = Logger.getLogger(TrayCreator.class);
     private Properties constants = new Properties();
 
     public TrayCreator() throws IOException {
-        /**
+        /*
          * To run from IDE need to replace propIn initialization with
          * InputStream propIn = new FileInputStream("./constants.properties");
          */
@@ -89,10 +90,12 @@ public class TrayCreator {
 
         //Adding components to pop-up menu
         MenuItem aboutItem = new MenuItem("About");
+        MenuItem settingsItem = new MenuItem("Settings");
         MenuItem run = new MenuItem("Run");
         MenuItem exitItem = new MenuItem("Exit");
 
         //Adding components to popup menu
+        popup.add(settingsItem);
         popup.add(run);
         popup.addSeparator();
         popup.add(aboutItem);
@@ -110,13 +113,23 @@ public class TrayCreator {
 
         run.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    wavReader.scanFiles();
-                } catch (IOException e1) {
-                    logger.error(e1);
-                } catch (UnsupportedAudioFileException e1) {
-                    logger.error(e1);
+                if (constants.contains("wavInputFolder")&&constants.contains("outputFilePath")) {
+                    try {
+                        wavReader.scanFiles();
+                    } catch (IOException | UnsupportedAudioFileException e1) {
+                        logger.error(e1);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null,
+                            "Run settings first to configure input and output paths");
                 }
+            }
+        });
+
+        settingsItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                settingsWorker.openSettings();
             }
         });
 
