@@ -64,6 +64,7 @@ public class TrayCreator {
 
     private void trayInit() throws IOException {
         wavReader = new WavMetadataReader();
+        settingsWorker = new SettingsWorker();
         StringBuilder builder = new StringBuilder();
 
         //Getting text for "about" dialog
